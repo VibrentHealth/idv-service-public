@@ -1,0 +1,81 @@
+---
+spring:
+  datasource:
+    platform: mysql
+    url: jdbc:tc:mysql:5.7://localhost:3306/idv
+    dataSourceClassName: com.mysql.jdbc.jdbc2.optional.MysqlDataSource
+    driverClassName: org.testcontainers.jdbc.ContainerDatabaseDriver
+    username: ${DB_USERNAME:root}
+    password: ${DB_PASSWORD:password}
+  jpa:
+    database: mysql
+    database-platform: org.hibernate.dialect.MySQL5InnoDBDialect
+    show_sql: false
+    openInView: false
+    hibernate:
+      ddl-auto: none
+
+vibrent:
+  ext-oauth-manager:
+    saveTokenToSTR : false
+    service.name: idv
+    config.getUserInfoUrl: ${API_SERVER:http://api:8080}/api/account/managed
+    oauth:
+      authorizeUrl: ${AUTHORIZE_URL:https://api.idmelabs.com/oauth/authorize}
+      tokenUrl: ${TOKEN_URL:https://api.idmelabs.com/oauth/token}
+      revokeUrl: ${REVOKE_URL:https://accounts.google.com/o/oauth2/revoke}
+      clientId: ${CLIENT_ID:clientId}
+      secret: ${ID_ME_CLIENT_SECRET:clientSecret}
+      scope: ${SCOPE:openid kba_replacement}
+      redirectUri: ${REDIRECT_URI:http://localhost:8080/api/idv/callback}
+      responsePath: idVerification
+    oidc:
+      enabled: true
+      key-set-uri: ${JWK_URI:https://api.idmelabs.com}
+      attribute:
+        enabled: ${FETCH_ATTRIBUTES:true}
+        uri: ${ATTRIBUTE_URI:https://api.idmelabs.com/api/public/v3/attributes.json}
+    kafka:
+      enabled: ${KAFKA_ENABLED:false}
+      server: ${KAFKA_HOST:localhost:9092}
+    idp:
+      serverHost: ${IDP_SERVER:http://localhost:8080}
+      tokenUrl: ${IDP_SERVER:http://localhost:8080}/api/oauth/token
+      clientId: ${IDP_CLIENT_ID:bluebutton}
+      clientSecret: ${IDP_CLIENT_SECRET:idvSecret}
+      grantType: ${IDP_GRANT_TYPE:client_credentials}
+      scope: ${IDP_SCOPE:read+write}
+    redis.properties:
+      redisson-ssl-enaled: ${REDIS_SSL_ENABLED:false}
+      redisson-address: ${REDIS_URL:localhost:6379}
+      redisson-is-clustered: ${IS_REDIS_CLUSTERED:false}
+      redisson-cluster-type: ${REDIS_CLUSTER_TYPE:replicated}
+      redisson-config: classpath:config/redisson-ss.yml
+      redisson-replicated-config: classpath:config/redisson-replicated.yml
+      redisson-cluster-config: classpath:config/redisson-cluster.yml
+  oidc-auth:
+    keycloak:
+      baseAuthUrl: ${KEYCLOAK_BASEURL:https://keycloak-daily.vibrenthealth.com/auth}
+      resourceId: ${KEYCLOAK_RESOURCEID:participant}
+      participantRealm: ${KEYCLOAK_PARTICIPANT_REALM:default_participant_realm}
+      enterpriseRealm: ${KEYCLOAK_ENTERPRISE_REALM:default_realm}
+      enabled: ${KEYCLOAK_PARTICIPANT_ENABLED:true}
+      clientId: ${KEYCLOAK_API_CLIENT_ID:client_id}
+      clientSecret: ${CLIENT_CREDENTIAL_API_SECRET:secret}
+
+
+
+swagger:
+  enabled: ${SWAGGER_ENABLED:false}
+
+# Actuator keys for enabling liveness and readiness endpoints.
+management:
+  endpoint:
+    health:
+      probes:
+        enabled: true
+  health:
+    livenessState:
+      enabled: true
+    readinessState:
+      enabled: true

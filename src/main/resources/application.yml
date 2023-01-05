@@ -1,0 +1,82 @@
+---
+spring:
+  datasource:
+    platform: mysql
+    url: jdbc:mysql://${DB_HOST:localhost}:${DB_PORT:3306}/idv?autoreconnect=true&enabledTLSProtocols=TLSv1,TLSv1.1,TLSv1.2
+    username: ${DB_USERNAME:root}
+    password: ${DB_PASSWORD:password}
+
+  jpa:
+    database-platform: org.hibernate.dialect.MySQL5InnoDBDialect
+    show_sql: false
+    hibernate:
+      ddl-auto: none
+    properties.org.hibernate.envers:
+      default_catalog: idv_audit
+      audit_table_suffix: _aud
+
+vibrent:
+  ext-oauth-manager:
+    saveTokenToSTR : ${SAVE_TOKEN_TO_STR:false}
+    service.name: idv
+    config.getUserInfoUrl: ${API_SERVER:http://api:8080}/api/account/managed
+    oauth:
+      authorizeUrl: ${AUTHORIZE_URL:https://api.idmelabs.com/oauth/authorize}
+      tokenUrl: ${TOKEN_URL:https://api.idmelabs.com/oauth/token}
+      revokeUrl: ${REVOKE_URL:https://accounts.google.com/o/oauth2/revoke}
+      clientId: ${CLIENT_ID:ebf99fe532c18d1eac259c89b3dde2a7}
+      secret: ${ID_ME_CLIENT_SECRET:secret}
+      scope: ${SCOPE:openid kba_replacement}
+      redirectUri: ${REDIRECT_URI:https://www.vibrenthealth.com/idme/callback}
+      responsePath: idVerification
+    oidc:
+      enabled: true
+      key-set-uri: ${JWK_URI:https://api.idmelabs.com}
+      attribute:
+        enabled: ${FETCH_ATTRIBUTES:true}
+        uri: ${ATTRIBUTE_URI:https://api.idmelabs.com/api/public/v3/attributes.json}
+    kafka:
+      enabled: ${KAFKA_ENABLED:true}
+      server: ${KAFKA_HOST:localhost:9092}
+    redis.properties:
+      redisson-ssl-enaled: ${REDIS_SSL_ENABLED:false}
+      redisson-address: ${REDIS_URL:localhost:6379}
+      redisson-is-clustered: ${IS_REDIS_CLUSTERED:false}
+      redisson-cluster-type: ${REDIS_CLUSTER_TYPE:replicated}
+      redisson-config: classpath:config/redisson-ss.yml
+      redisson-replicated-config: classpath:config/redisson-replicated.yml
+      redisson-cluster-config: classpath:config/redisson-cluster.yml
+    idp:
+      serverHost: ${IDP_SERVER:http://localhost:8080}
+      tokenUrl: ${IDP_SERVER:http://localhost:8080}/api/oauth/token
+      clientId: ${IDP_CLIENT_ID:bluebutton}
+      clientSecret: ${IDP_CLIENT_SECRET:idvSecret}
+      grantType: ${IDP_GRANT_TYPE:client_credentials}
+      scope: ${IDP_SCOPE:read+write}
+  oidc-auth:
+    keycloak:
+      baseAuthUrl: ${KEYCLOAK_BASEURL:https://keycloak-daily.vibrenthealth.com/auth}
+      resourceId: ${KEYCLOAK_RESOURCEID:participant}
+      participantRealm: ${KEYCLOAK_PARTICIPANT_REALM:default_participant_realm}
+      enterpriseRealm: ${KEYCLOAK_ENTERPRISE_REALM:default_realm}
+      enabled: ${KEYCLOAK_PARTICIPANT_ENABLED:true}
+      clientId: ${KEYCLOAK_API_CLIENT_ID:client_id}
+      clientSecret: ${CLIENT_CREDENTIAL_API_SECRET:secret}
+
+
+swagger:
+  enabled: ${SWAGGER_ENABLED:false}
+
+# Actuator keys for enabling liveness and readiness endpoints.
+management:
+  endpoint:
+    health:
+      probes:
+        enabled: true
+  health:
+    livenessState:
+      enabled: true
+    readinessState:
+      enabled: true
+
+
